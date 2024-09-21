@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain to IP Converter</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 400px;
+            max-width: 90%;
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            box-shadow: 0 8px 15px rgba(0, 91, 187, 0.4);
+        }
+
+        button:active {
+            background-color: #003e8a;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Domain to IP Converter</h1>
+        <input type="text" id="domainInput" placeholder="Enter domain (e.g., example.com)">
+        <button onclick="convertDomainToIP()">Convert to IP</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function convertDomainToIP() {
+            const domain = document.getElementById('domainInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            if (domain === '') {
+                resultDiv.innerHTML = '<span class="error">Please enter a domain.</span>';
+                return;
+            }
+
+            fetch(`https://dns.google/resolve?name=${domain}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.Answer) {
+                        const ip = data.Answer.find(answer => answer.type === 1)?.data;
+                        if (ip) {
+                            resultDiv.innerHTML = `IP Address: <strong>${ip}</strong>`;
+                        } else {
+                            resultDiv.innerHTML = '<span class="error">No IP address found for this domain.</span>';
+                        }
+                    } else {
+                        resultDiv.innerHTML = '<span class="error">Invalid domain or no data found.</span>';
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = '<span class="error">Error fetching IP address.</span>';
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+
+</body>
+</html>
